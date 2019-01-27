@@ -2,6 +2,7 @@
 
 ### Table of Contents
 
+- [Assignment](Assignment.md)
 - [Requirements](#requirements)
 - [Setup](#setup)
 - [Execution](#execution)
