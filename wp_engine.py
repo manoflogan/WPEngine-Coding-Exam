@@ -55,7 +55,7 @@ def read_csv_file(input_csv_file_path):
                     '%Y-%m-%d'))
 
 
-def collate_similar_data(input_csv_file_path, output_file_path):
+def collate_similar_data(input_csv_file_path, output_csv_file_path):
     """Collates input data from multiple resources to write to putput file.
 
     Args:
@@ -64,7 +64,9 @@ def collate_similar_data(input_csv_file_path, output_file_path):
         output_csv_file_path: fully qualified path of the output file
             path to be written to
     """
-    with open(output_file_path, 'w') as file_object:
+    if not input_csv_file_path or not output_csv_file_path:
+        return
+    with open(output_csv_file_path, 'w') as file_object:
         csv_writer = csv.writer(file_object, delimiter=',')
         csv_writer.writerow(
             ('Account ID', 'First Name', 'Created On', 'Status',

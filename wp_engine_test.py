@@ -99,3 +99,47 @@ def test_collate_similar_data(input_csv_file, output_csv_file):
                  '2015-03-20')]
     finally:
         os.remove(output_csv_file)
+
+
+def test_collate_similar_data__missing_input_file(output_csv_file):
+    rows = []
+    csv_writer_object = mock.Mock()
+    csv_writer_object.writerow = lambda row: rows.append(row)
+    with mock.patch('csv.writer',
+                    return_value=csv_writer_object) as mock_writer, \
+            mock.patch(
+                'wp_engine.read_csv_file',
+                side_effect=read_csv_file) as mock_read_csv_file, \
+            mock.patch(
+                'wp_engine.fetch_account_status', return_value={
+                    'account_id': 12345,
+                    'status': 'fraud',
+                    'created_on': '2015-03-20'
+                }) as mock_fetch_account_status:
+        wp_engine.collate_similar_data(None, output_csv_file)
+        assert mock_writer.call_count == 0
+        assert mock_read_csv_file.call_count == 0
+        assert mock_fetch_account_status.call_count == 0
+        assert rows == []
+
+
+def test_collate_similar_data__missing_output_file(input_csv_file):
+    rows = []
+    csv_writer_object = mock.Mock()
+    csv_writer_object.writerow = lambda row: rows.append(row)
+    with mock.patch('csv.writer',
+                    return_value=csv_writer_object) as mock_writer, \
+            mock.patch(
+                'wp_engine.read_csv_file',
+                side_effect=read_csv_file) as mock_read_csv_file, \
+            mock.patch(
+                'wp_engine.fetch_account_status', return_value={
+                    'account_id': 12345,
+                    'status': 'fraud',
+                    'created_on': '2015-03-20'
+                }) as mock_fetch_account_status:
+        wp_engine.collate_similar_data(input_csv_file, None)
+        assert mock_writer.call_count == 0
+        assert mock_read_csv_file.call_count == 0
+        assert mock_fetch_account_status.call_count == 0
+        assert rows == []
