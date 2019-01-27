@@ -70,8 +70,6 @@ def collate_similar_data(input_csv_file_path, output_file_path):
             ('Account ID', 'First Name', 'Created On', 'Status',
              'Status Set On'))
         for csv_row in read_csv_file(input_csv_file_path):
-            if not csv_row:
-                continue
             account_status = fetch_account_status(csv_row[0])
             csv_writer.writerow(csv_row + (
                 account_status.get('status') or '',

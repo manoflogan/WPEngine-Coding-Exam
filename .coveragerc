@@ -1,0 +1,11 @@
+[paths]
+source=*.py
+
+[run]
+omit=
+    env/**
+    *_test.py
+
+[html]
+directory=html_coverage_report
+title="WPEngine Coverage Report"
