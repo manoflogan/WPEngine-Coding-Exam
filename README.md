@@ -1,4 +1,4 @@
-# WP Engine Coding Exercise
+# WP Engine Coding Exercise [![Build Status](https://travis-ci.org/manoflogan/WPEngine-Coding-Exam.svg?branch=master)](https://travis-ci.org/manoflogan/WPEngine-Coding-Exam)
 
 ### Table of Contents
 
