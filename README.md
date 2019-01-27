@@ -1,16 +1,17 @@
 # WP Engine Coding Exercise
 
-## Table of Contents
+### Table of Contents
 
 - [Requirements](#requirements)
 - [Setup](#setup)
+- [Execution](#execution)
 
-## Requirements
+### Requirements
 
 * Python 3.6.x
 * `requests` package
 
-## Setup
+### Setup
 
 * Install Python 3.6.x. You can use your favourite tool to install the software (HomeBrew, pyenv) etc.
 
@@ -18,4 +19,8 @@
 
 * Install the python packages required by the project by executing `pip install -r requirements.txt`.
 
+## Execution
+
 * Run the command ` python wp_engine.py --input '<fully qualified_file_path_to_input_csv_file>' --output '<fully qualified path to output csv>'` to execute the program.
+
+* Run the command `pytest` to run the unit tests. The code coverage reports will be found under `html_coverage_report` directory in the main project.
