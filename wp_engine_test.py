@@ -32,7 +32,7 @@ def test_read_csv_file(input_csv_file):
     assert actual == expected
 
 
-def test_fetch_account_status__success():
+async def test_fetch_account_status__success():
     response_object = mock.Mock()
     response_object.status_code = 200
     expected = {
@@ -42,7 +42,7 @@ def test_fetch_account_status__success():
     response_object.json = mock.MagicMock(return_value=expected)
     with mock.patch('requests.get',
                     return_value=response_object) as mock_request:
-        response = wp_engine.fetch_account_status(12345)
+        response = await (wp_engine.fetch_account_status(12345))
         assert (
             mock_request.call_args[0][0] == (
                 'http://interview.wpengine.io/v1/accounts/12345'))
@@ -50,12 +50,12 @@ def test_fetch_account_status__success():
         assert response == expected
 
 
-def test_fetch_account_status__failure():
+async def test_fetch_account_status__failure():
     response_object = mock.Mock()
     response_object.status_code = 500
     with mock.patch('requests.get',
                     return_value=response_object) as mock_request:
-        response = wp_engine.fetch_account_status(12345)
+        response = await (wp_engine.fetch_account_status(12345))
         assert (
             mock_request.call_args[0][0] == (
                 'http://interview.wpengine.io/v1/accounts/12345'))
@@ -69,7 +69,7 @@ def read_csv_file(input_file_path):
         yield row
 
 
-def test_collate_similar_data(input_csv_file, output_csv_file):
+async def test_collate_similar_data(input_csv_file, output_csv_file):
     try:
         rows = []
         csv_writer_object = mock.Mock()
@@ -85,7 +85,8 @@ def test_collate_similar_data(input_csv_file, output_csv_file):
                         'status': 'fraud',
                         'created_on': '2015-03-20'
                     }) as mock_fetch_account_status:
-            wp_engine.collate_similar_data(input_csv_file, output_csv_file)
+            await (wp_engine.collate_similar_data(
+                input_csv_file, output_csv_file))
             assert mock_writer.call_count == 1
             assert mock_writer.call_args[0][0] is not None
             assert mock_read_csv_file.call_count == 1
@@ -101,7 +102,7 @@ def test_collate_similar_data(input_csv_file, output_csv_file):
         os.remove(output_csv_file)
 
 
-def test_collate_similar_data__missing_input_file(output_csv_file):
+async def test_collate_similar_data__missing_input_file(output_csv_file):
     rows = []
     csv_writer_object = mock.Mock()
     csv_writer_object.writerow = lambda row: rows.append(row)
@@ -116,14 +117,14 @@ def test_collate_similar_data__missing_input_file(output_csv_file):
                     'status': 'fraud',
                     'created_on': '2015-03-20'
                 }) as mock_fetch_account_status:
-        wp_engine.collate_similar_data(None, output_csv_file)
+        await (wp_engine.collate_similar_data(None, output_csv_file))
         assert mock_writer.call_count == 0
         assert mock_read_csv_file.call_count == 0
         assert mock_fetch_account_status.call_count == 0
         assert rows == []
 
 
-def test_collate_similar_data__missing_output_file(input_csv_file):
+async def test_collate_similar_data__missing_output_file(input_csv_file):
     rows = []
     csv_writer_object = mock.Mock()
     csv_writer_object.writerow = lambda row: rows.append(row)
@@ -138,15 +139,15 @@ def test_collate_similar_data__missing_output_file(input_csv_file):
                     'status': 'fraud',
                     'created_on': '2015-03-20'
                 }) as mock_fetch_account_status:
-        wp_engine.collate_similar_data(input_csv_file, None)
+        await (wp_engine.collate_similar_data(input_csv_file, None))
         assert mock_writer.call_count == 0
         assert mock_read_csv_file.call_count == 0
         assert mock_fetch_account_status.call_count == 0
         assert rows == []
 
 
-def test_collate_similar_data__missing_http_request_data(input_csv_file,
-                                                         output_csv_file):
+async def test_collate_similar_data__missing_http_request_data(
+        input_csv_file, output_csv_file):
     try:
         rows = []
         csv_writer_object = mock.Mock()
@@ -159,7 +160,8 @@ def test_collate_similar_data__missing_http_request_data(input_csv_file,
                 mock.patch(
                     'wp_engine.fetch_account_status',
                     return_value={}) as mock_fetch_account_status:
-            wp_engine.collate_similar_data(input_csv_file, output_csv_file)
+            await (wp_engine.collate_similar_data(input_csv_file,
+                                                  output_csv_file))
             assert mock_writer.call_count == 1
             assert mock_read_csv_file.call_count == 1
             assert mock_fetch_account_status.call_count == 1
