@@ -10,6 +10,7 @@ To call this function:
 
 
 import argparse
+import asyncio
 import csv
 import datetime
 import itertools
@@ -20,7 +21,7 @@ import requests
 _ACCOUNTS_URL = 'http://interview.wpengine.io/v1/accounts/{account_id}'
 
 
-def fetch_account_status(account_id):
+async def fetch_account_status(account_id):
     """Makes the http request ot fetch account status for account id.
 
     Args:
@@ -38,8 +39,8 @@ def read_csv_file(input_csv_file_path):
     """Reads a csv file to return a tuple of csv rows.
 
     Args:
-        input_csv_file_path: fully qualified path of the
-            input csv file to be read
+        input_csv_file_path: fully qualified path of the input csv file to be
+            read
 
     Yields:
         tuple representing the account id, first name, and created date in that
@@ -55,7 +56,7 @@ def read_csv_file(input_csv_file_path):
                     '%Y-%m-%d'))
 
 
-def collate_similar_data(input_csv_file_path, output_csv_file_path):
+async def collate_similar_data(input_csv_file_path, output_csv_file_path):
     """Collates input data from multiple resources to write to putput file.
 
     Args:
@@ -72,7 +73,7 @@ def collate_similar_data(input_csv_file_path, output_csv_file_path):
             ('Account ID', 'First Name', 'Created On', 'Status',
              'Status Set On'))
         for csv_row in read_csv_file(input_csv_file_path):
-            account_status = fetch_account_status(csv_row[0])
+            account_status = (await fetch_account_status(csv_row[0]))
             csv_writer.writerow(csv_row + (
                 account_status.get('status') or '',
                 datetime.datetime.strftime(
@@ -90,4 +91,9 @@ if __name__ == '__main__':
                         help='Fully qualified path of output file name',
                         required='True')
     arguments = parser.parse_args(sys.argv[1:])
-    collate_similar_data(arguments.input, arguments.output)
+    loop = asyncio.get_event_loop()
+    try:
+        loop.run_until_complete(
+            collate_similar_data(arguments.input, arguments.output))
+    finally:
+        loop.close()

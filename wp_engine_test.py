@@ -143,3 +143,30 @@ def test_collate_similar_data__missing_output_file(input_csv_file):
         assert mock_read_csv_file.call_count == 0
         assert mock_fetch_account_status.call_count == 0
         assert rows == []
+
+
+def test_collate_similar_data__missing_http_request_data(input_csv_file,
+                                                         output_csv_file):
+    try:
+        rows = []
+        csv_writer_object = mock.Mock()
+        csv_writer_object.writerow = lambda row: rows.append(row)
+        with mock.patch('csv.writer',
+                        return_value=csv_writer_object) as mock_writer, \
+                mock.patch(
+                    'wp_engine.read_csv_file',
+                    side_effect=read_csv_file) as mock_read_csv_file, \
+                mock.patch(
+                    'wp_engine.fetch_account_status',
+                    return_value={}) as mock_fetch_account_status:
+            wp_engine.collate_similar_data(input_csv_file, output_csv_file)
+            assert mock_writer.call_count == 1
+            assert mock_read_csv_file.call_count == 1
+            assert mock_fetch_account_status.call_count == 1
+            assert rows == [
+                ('Account ID', 'First Name', 'Created On', 'Status',
+                 'Status Set On'),
+                (12345, 'lexcorp', 'Lex', datetime.date(2011, 1, 12), '',
+                 '')]
+    finally:
+        os.remove(output_csv_file)
