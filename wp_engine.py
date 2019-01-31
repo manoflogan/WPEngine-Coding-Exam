@@ -75,7 +75,7 @@ async def collate_similar_data(input_csv_file_path, output_csv_file_path):
         for csv_row in read_csv_file(input_csv_file_path):
             account_status = (await fetch_account_status(csv_row[0]))
             csv_writer.writerow(csv_row + (
-                account_status.get('status') or '',
+                account_status.get('status', ''),
                 datetime.datetime.strftime(
                     datetime.datetime.strptime(
                         account_status.get('created_on'), '%Y-%m-%d'),
@@ -86,10 +86,10 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--input',
                         help='Fully qualified path of input file name',
-                        required='True')
+                        required=True)
     parser.add_argument('--output',
                         help='Fully qualified path of output file name',
-                        required='True')
+                        required=True)
     arguments = parser.parse_args(sys.argv[1:])
     loop = asyncio.get_event_loop()
     try:
